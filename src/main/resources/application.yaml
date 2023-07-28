@@ -1,0 +1,16 @@
+management:
+  tracing:
+    enabled: true
+    sampling.probability: 1.0
+
+logging:
+  level:
+    root: ERROR
+    org.springframework.web: ERROR
+    com.medicine: INFO
+
+application:
+  variables:
+    my-token: ${MY_TOKEN}
+    whatsapp-token: ${WHATSAPP_TOKEN}
+    openai-token: ${OPENAI_TOKEN}

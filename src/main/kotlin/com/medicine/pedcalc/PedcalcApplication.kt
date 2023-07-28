@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class PedcalcApplication
 
 fun main(args: Array<String>) {
-	runApplication<PedcalcApplication>(*args)
+    runApplication<PedcalcApplication>(*args)
 }

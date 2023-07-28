@@ -20,11 +20,22 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
+    //nesse contexto acuator é importante para propagar traceID e spanID
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.5.2")
+    implementation("com.google.code.gson:gson:2.8.9")
+
+    //dependencias de tracing
+    implementation(platform("io.micrometer:micrometer-tracing-bom:1.1.3"))
+    implementation("io.micrometer:micrometer-tracing")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+
     // import Kotlin API client BOM
     implementation(platform("com.aallam.openai:openai-client-bom:3.3.0"))
-
     // define dependencies without versions
     implementation("com.aallam.openai:openai-client")
     runtimeOnly("io.ktor:ktor-client-okhttp")

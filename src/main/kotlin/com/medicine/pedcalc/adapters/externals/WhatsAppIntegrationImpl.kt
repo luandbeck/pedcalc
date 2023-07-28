@@ -2,6 +2,7 @@ package com.medicine.pedcalc.adapters.externals
 
 import com.medicine.pedcalc.adapters.externals.dtos.WhatsAppSendMessageRequest
 import com.medicine.pedcalc.adapters.externals.dtos.WhatsAppText
+import com.medicine.pedcalc.configurations.AppConfiguration
 import com.medicine.pedcalc.domain.models.Solicitation
 import com.medicine.pedcalc.domain.ports.externals.WhatsAppIntegration
 import org.springframework.http.HttpEntity
@@ -12,15 +13,16 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
 @Component
-class WhatsAppIntegrationImpl(private val restTemplate: RestTemplate) : WhatsAppIntegration {
-
-    private val TOKEN_NAME = "WHATSAPP_TOKEN"
+class WhatsAppIntegrationImpl(
+    private val appConfiguration: AppConfiguration,
+    private val restTemplate: RestTemplate
+) : WhatsAppIntegration {
 
     override fun sendMessage(solicitation: Solicitation, resposta: String) {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
 
-        val token = System.getenv(TOKEN_NAME)
+        val token = appConfiguration.whatsAppToken
         val url = "https://graph.facebook.com/v17.0/${solicitation.telefoneBot}/messages?access_token=$token"
         val request = buildRequest(solicitation, resposta)
         restTemplate.exchange(

@@ -1,5 +1,6 @@
 package com.medicine.pedcalc.domain.models
 
+import com.google.gson.Gson
 import com.medicine.pedcalc.domain.utils.buscaTodasClassesMedicamento
 import java.util.*
 import kotlin.reflect.KMutableProperty
@@ -18,6 +19,31 @@ fun parseMedicamentoFromString(input: String): Medicamento? {
     }
         ?: return null
 
+}
+
+fun parseMedicamentoFromJson(json: String?): Medicamento? {
+    try {
+        val gson = Gson()
+        val jsonObject: Map<String, List<Map<String, String>>> =
+            gson.fromJson(json, Map::class.java) as Map<String, List<Map<String, String>>>
+
+        val className: String = jsonObject["medicamento"] as String? ?: return null
+        val atributosJson: List<Map<String, String>> = jsonObject["atributos"] ?: return null
+
+        val stringBuilder = StringBuilder()
+        stringBuilder.append(className)
+
+        for (atributoJson in atributosJson) {
+            val atributo = atributoJson["nome"] ?: continue
+            val valor = atributoJson["valor"] ?: continue
+
+            stringBuilder.append(", $atributo $valor")
+        }
+
+        return parseMedicamentoFromString(stringBuilder.toString())
+    } catch (e: Exception) {
+        return null
+    }
 }
 
 private fun criaMedicamento(medicamentoClass: Medicamento, input: String): Medicamento {
