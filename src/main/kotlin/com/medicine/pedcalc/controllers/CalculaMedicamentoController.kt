@@ -2,7 +2,7 @@ package com.medicine.pedcalc.controllers
 
 import com.medicine.pedcalc.configurations.AppConfiguration
 import com.medicine.pedcalc.controllers.dtos.WhatsAppBusinessAccountRequest
-import com.medicine.pedcalc.domain.models.Solicitation
+import com.medicine.pedcalc.domain.models.CalcMessage
 import com.medicine.pedcalc.domain.services.OrquestradorMedicamentoService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,6 @@ class CalculaMedicamentoController(
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(CalculaMedicamentoController::class.java)
-
-    private val MY_TOKEN_NAME = "MY_TOKEN"
 
     @GetMapping("/webhook")
     fun webhook(
@@ -59,7 +57,7 @@ class CalculaMedicamentoController(
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
-    private fun buildSolicitation(body: WhatsAppBusinessAccountRequest): Solicitation {
+    private fun buildSolicitation(body: WhatsAppBusinessAccountRequest): CalcMessage {
         val value = body.entry.first().changes.first().value
         val completeMessage = value.messages!!.first()
 
@@ -69,6 +67,10 @@ class CalculaMedicamentoController(
 
         log.info("Dados requisicao:$botPhone $clientPhone $textMessage")
 
-        return Solicitation(botPhone, clientPhone, textMessage)
+        return CalcMessage(botPhone, clientPhone, textMessage)
+    }
+
+    private fun teste(): String {
+        return "teste"
     }
 }

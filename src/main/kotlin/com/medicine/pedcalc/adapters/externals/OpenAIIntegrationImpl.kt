@@ -22,7 +22,14 @@ class OpenAIIntegrationImpl(private val openAI: OpenAI) : OpenAIIntegration {
 
     override fun callChat(text: String): String? = runBlocking {
         val content =
-            "Voce poderia converter o texto abaixo em um JSON de modo que ele tenha o nome do medicamento desejado e o valor das variaveis recebidas sem suas unidades ? São exemplos de variaveis: peso, dose, diametro, idade, temperatura, etc. \\n É IMPORTANTISSIMO que voce responda apenas o Json e mais nenhum texto, se você não encontrar nenhuma informação, pode responder o JSON em branco.  \\n Texto: '$text' \\n JSON Modelo: {\"medicamento\":\"nomeMedicamento\",\"atributos\":[{\"nome\":\"nomePropriedade1\",\"valor\":\"valorPropriedade1\"},{\"nome\":\"nomePropriedade2\",\"valor\":\"valorPropriedade2\"},{\"nome\":\"nomePropriedadeX\",\"valor\":\"valorPropriedadeX\"}]}"
+            "Voce poderia converter o texto abaixo em um UNICO JSON de modo que ele tenha o nome do medicamento/instrumento " +
+                    "cirurgico desejado e o valor das variaveis recebidas sem suas unidades ? São exemplos de variaveis: " +
+                    "peso, dose, diametro, idade, temperatura, etc. \\n É IMPORTANTISSIMO que voce responda apenas o Json " +
+                    "e mais nenhum texto, se você não encontrar nenhuma informação, pode responder o JSON em branco.  \\n " +
+                    "Texto: '$text' \\n " +
+                    "JSON Modelo: {\"medicamento\":\"nomeMedicamento\",\"atributos\":[{\"nome\":\"nomePropriedade1\",\"valor\":\"valorPropriedade1\"},{\"nome\":\"nomePropriedade2\",\"valor\":\"valorPropriedade2\"},{\"nome\":\"nomePropriedadeX\",\"valor\":\"valorPropriedadeX\"}]} " +
+                    "JSON Exemplo Medicamento: {\"medicamento\":\"Dipirona\",\"atributos\":[{\"nome\":\"peso\",\"valor\":\"13.5\"},{\"nome\":\"dose\",\"valor\":\"25\"}]} " +
+                    "JSON Exemplo Instrumento: {\"medicamento\":\"Tubo\",\"atributos\":[{\"nome\":\"idade\",\"valor\":\"0\"},{\"nome\":\"peso\",\"valor\":\"14.5\"}]}"
 
         val message = ChatMessage(role = User, content = content)
         val request = ChatCompletionRequest(model = ModelId(CHAT_MODEL), messages = listOf(message), temperature = 0.2)

@@ -11,70 +11,51 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class OrquestradorMedicamentoService(
+class OrquestradorMedicamentoService2(
     private val calculateService: RespostaMedicamentoService,
     private val chat: OpenAIIntegration,
     private val whatsAppIntegration: WhatsAppIntegration
 ) {
 
-    fun execute(message: CalcMessage) {
-        return listOf(message)
-            .map(this::helperResult)
-            .map(this::calculateOriginalMessage)
-            .map(this::calculateChatMessage)
-            .map(this::generateErrorMessage)
-            .map(this.whatsAppIntegration::sendMessage)
-            .last()
+    fun execute(message: CalcMessage): CalcMessage {
+        when {
+            helperResult(message) -> return message
+            calculateOriginalMessage(message) -> return message
+            calculateChatMessage(message) -> return message
+            else -> generateErrorMessage(message)
+        }
+        return message
     }
 
-    fun helperResult(message: CalcMessage): CalcMessage {
+    fun helperResult(message: CalcMessage): Boolean {
         if (message.requestMessage.lowercase(Locale.getDefault()).contains("lista")) {
             message.response = ResponseMessage(buscaListaMedicamentos(), true)
         }
 
-        return message
+        return message.response?.finalResult == true
     }
 
-    fun calculateOriginalMessage(message: CalcMessage): CalcMessage {
-        if (message.response?.finalResult == true) {
-            return message
-        }
-
+    fun calculateOriginalMessage(message: CalcMessage): Boolean {
         val medicineMessage = parseMedicamentoFromString(message.requestMessage)
         if (medicineMessage != null) {
             message.response = calculateService.execute(medicineMessage)
         }
 
-        return message
+        return message.response?.finalResult == true
     }
 
-    fun calculateChatMessage(message: CalcMessage): CalcMessage {
-        if (message.response?.finalResult == true) {
-            return message
-        }
-
+    fun calculateChatMessage(message: CalcMessage): Boolean {
         val jsonChat = this.chat.callChat(message.requestMessage) ?: ""
         val medicineChat = parseMedicamentoFromJson(jsonChat)
         if (medicineChat != null) {
             message.response = calculateService.execute(medicineChat)
         }
 
-        return message
+        return message.response?.finalResult == true
     }
 
-    fun generateErrorMessage(message: CalcMessage): CalcMessage {
-        if (message.response != null) {
-            return message
-        }
-
-        val errorMessage = "Não entendi o comando ou não encontrei o medicamento.\n" +
-                "\n" +
-                "Caso queira ver a lista de medicamentos disponíveis digite. 'lista medicamentos'.\n" +
-                "\n" +
-                "Caso queira ajuda sobre algum medicamento específico digite seu nome seguido de 'ajuda'. Exemplo: 'dipirona, ajuda'"
-
-        message.response = ResponseMessage(errorMessage, true)
-        return message
+    fun generateErrorMessage(message: CalcMessage) {
+        // Implemente aqui o que deseja fazer no método final
     }
 
     private fun buscaListaMedicamentos(): String {
