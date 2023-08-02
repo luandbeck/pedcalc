@@ -24,18 +24,18 @@ class Dipirona : MedicamentoBase() {
     }
 
     override fun retornaAjuda(): String {
-        return "Para calcular a $className informe o peso do paciente em kg e a dose da medicação em mg. Exemplo: '$className, peso 12.5, dose ${getStandarDose()}'."
+        return "Para calcular a $className informe o peso do paciente em kg e a dose da medicação em mg. Exemplo: '$className, peso 12.5, dose ${getStandardValue()}'."
     }
 
     override fun getMessageError(): String {
-        return "Algum parâmetro não foi enviado ou está no formato inválido. Garanta que esteja seguindo o exemplo '$className, peso 12.5, dose ${getStandarDose()}'."
+        return "Algum parâmetro não foi enviado ou está no formato inválido. Garanta que esteja seguindo o exemplo '$className, peso 12.5, dose ${getStandardValue()}'."
     }
 
     override fun isValid(): Boolean {
         return listOf(this.peso, this.dose).all { param -> isValidDouble(param) }
     }
 
-    override fun getStandarDose(): String {
+    override fun getStandardValue(): String {
         return "25"
     }
 

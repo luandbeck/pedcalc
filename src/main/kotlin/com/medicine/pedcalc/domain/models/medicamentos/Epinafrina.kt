@@ -41,7 +41,7 @@ class Epinafrina : MedicamentoBase() {
         return "Algum parâmetro não foi enviado ou está no formato inválido. Garanta que esteja seguindo o exemplo '$className, peso 12.5."
     }
 
-    override fun getStandarDose(): String {
+    override fun getStandardValue(): String {
         return "0.01"
     }
 

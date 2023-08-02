@@ -3,7 +3,7 @@ package com.medicine.pedcalc.domain.models.medicamentos
 import com.medicine.pedcalc.domain.models.MedicamentoBase
 import com.medicine.pedcalc.domain.utils.isValidDouble
 
-class Ketamina : MedicamentoBase() {
+class Cetamina : MedicamentoBase() {
     var peso: String? = null
     var dose: String? = null
 

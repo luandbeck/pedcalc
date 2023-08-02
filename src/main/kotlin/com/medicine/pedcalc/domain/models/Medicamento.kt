@@ -6,5 +6,5 @@ interface Medicamento {
     fun retornaAjuda(): String
     fun isValid(): Boolean
     fun getMessageError(): String
-    fun getStandarDose(): String
+    fun getStandardValue(): String
 }
