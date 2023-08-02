@@ -35,7 +35,7 @@ class OpenAIIntegrationImpl(private val openAI: OpenAI) : OpenAIIntegration {
         val request = ChatCompletionRequest(model = ModelId(CHAT_MODEL), messages = listOf(message), temperature = 0.2)
 
         val response = openAI.chatCompletion(request).choices.first().message?.content
-        log.info("RESPOSTA CHAT: $response")
+        log.info("CHAT RESPONSE: $response")
         response
     }
 }

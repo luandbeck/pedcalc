@@ -2,8 +2,8 @@ package com.medicine.pedcalc.controllers
 
 import com.medicine.pedcalc.configurations.AppConfiguration
 import com.medicine.pedcalc.controllers.dtos.WhatsAppBusinessAccountRequest
-import com.medicine.pedcalc.domain.models.CalcMessage
-import com.medicine.pedcalc.domain.services.OrquestradorMedicamentoService
+import com.medicine.pedcalc.domain.models.CalculationMessage
+import com.medicine.pedcalc.domain.services.OrchestratorService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,13 +15,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/calcula-ped")
-class CalculaMedicamentoController(
+@RequestMapping("/pedcalc")
+class PediatricsCalculatorController(
     private val appConfiguration: AppConfiguration,
-    private val service: OrquestradorMedicamentoService
+    private val service: OrchestratorService
 ) {
 
-    private val log: Logger = LoggerFactory.getLogger(CalculaMedicamentoController::class.java)
+    private val log: Logger = LoggerFactory.getLogger(PediatricsCalculatorController::class.java)
 
     @GetMapping("/webhook")
     fun webhook(
@@ -29,8 +29,8 @@ class CalculaMedicamentoController(
         @RequestParam(value = "hub.challenge") challenge: String,
         @RequestParam(value = "hub.verify_token") token: String
     ): String {
+        log.info("chamda get")
         if (token == appConfiguration.myToken) {
-            log.info("Chamada Get")
             return challenge
         }
 
@@ -40,24 +40,24 @@ class CalculaMedicamentoController(
     @PostMapping("/webhook")
     fun postWebhook(@RequestBody body: WhatsAppBusinessAccountRequest): ResponseEntity<Unit> {
         if (body.entry.first().changes.first().value.messages?.isEmpty() != false) {
-            log.info("Requisição ignorada")
+            log.info("Ignored request")
             log.info(body.toString())
             return ResponseEntity.status(HttpStatus.CREATED).build()
         }
 
-        log.info("Requisição aceita")
+        log.info("Accepted request")
         log.info(body.toString())
-        val solicitacao = this.buildSolicitation(body)
+        val message = this.buildSolicitation(body)
 
-        //Dispara a execução da solicitação em uma thread separada enviando o traceId (Contexto MDC)
+        //Triggers the execution of the request in a separate thread by sending the traceId (MDC Context)
         CoroutineScope(Dispatchers.IO).launch(MDCContext()) {
-            this@CalculaMedicamentoController.service.execute(solicitacao)
+            this@PediatricsCalculatorController.service.execute(message)
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).build()
     }
 
-    private fun buildSolicitation(body: WhatsAppBusinessAccountRequest): CalcMessage {
+    private fun buildSolicitation(body: WhatsAppBusinessAccountRequest): CalculationMessage {
         val value = body.entry.first().changes.first().value
         val completeMessage = value.messages!!.first()
 
@@ -65,12 +65,8 @@ class CalculaMedicamentoController(
         val clientPhone = completeMessage.from
         val textMessage = completeMessage.text.body
 
-        log.info("Dados requisicao:$botPhone $clientPhone $textMessage")
+        log.info("Request data:$botPhone $clientPhone $textMessage")
 
-        return CalcMessage(botPhone, clientPhone, textMessage)
-    }
-
-    private fun teste(): String {
-        return "teste"
+        return CalculationMessage(botPhone, clientPhone, textMessage)
     }
 }

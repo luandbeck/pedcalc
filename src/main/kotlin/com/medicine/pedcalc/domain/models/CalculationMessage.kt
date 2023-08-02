@@ -1,6 +1,6 @@
 package com.medicine.pedcalc.domain.models
 
-data class CalcMessage(
+data class CalculationMessage(
     val botPhone: String,
     val clientPhone: String,
     val requestMessage: String,

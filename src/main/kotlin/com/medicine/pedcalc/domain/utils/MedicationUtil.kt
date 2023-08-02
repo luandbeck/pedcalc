@@ -3,8 +3,8 @@ package com.medicine.pedcalc.domain.utils
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
-fun buscaTodasClassesMedicamento(): List<Class<*>> {
-    val packagePrefix = "com.medicine.pedcalc.domain.models.medicamentos"
+fun findAllMedications(): List<Class<*>> {
+    val packagePrefix = "com.medicine.pedcalc.domain.models.medications"
 
     val provider = ClassPathScanningCandidateComponentProvider(false)
     provider.addIncludeFilter(AssignableTypeFilter(Any::class.java))

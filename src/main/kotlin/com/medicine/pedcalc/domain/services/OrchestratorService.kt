@@ -1,23 +1,23 @@
 package com.medicine.pedcalc.domain.services
 
-import com.medicine.pedcalc.domain.models.CalcMessage
+import com.medicine.pedcalc.domain.models.CalculationMessage
 import com.medicine.pedcalc.domain.models.ResponseMessage
-import com.medicine.pedcalc.domain.models.parseMedicamentoFromJson
-import com.medicine.pedcalc.domain.models.parseMedicamentoFromString
+import com.medicine.pedcalc.domain.models.parseJsonToMedication
+import com.medicine.pedcalc.domain.models.parseStringToMedication
 import com.medicine.pedcalc.domain.ports.externals.OpenAIIntegration
 import com.medicine.pedcalc.domain.ports.externals.WhatsAppIntegration
-import com.medicine.pedcalc.domain.utils.buscaTodasClassesMedicamento
+import com.medicine.pedcalc.domain.utils.findAllMedications
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class OrquestradorMedicamentoService(
-    private val calculateService: RespostaMedicamentoService,
+class OrchestratorService(
+    private val calculateService: MedicationResponseService,
     private val chat: OpenAIIntegration,
     private val whatsAppIntegration: WhatsAppIntegration
 ) {
 
-    fun execute(message: CalcMessage) {
+    fun execute(message: CalculationMessage) {
         return listOf(message)
             .map(this::helperResult)
             .map(this::calculateOriginalMessage)
@@ -27,42 +27,42 @@ class OrquestradorMedicamentoService(
             .last()
     }
 
-    fun helperResult(message: CalcMessage): CalcMessage {
+    fun helperResult(message: CalculationMessage): CalculationMessage {
         if (message.requestMessage.lowercase(Locale.getDefault()).contains("lista")) {
-            message.response = ResponseMessage(buscaListaMedicamentos(), true)
+            message.response = ResponseMessage(buildResponseAllMedications(), true)
         }
 
         return message
     }
 
-    fun calculateOriginalMessage(message: CalcMessage): CalcMessage {
+    fun calculateOriginalMessage(message: CalculationMessage): CalculationMessage {
         if (message.response?.finalResult == true) {
             return message
         }
 
-        val medicineMessage = parseMedicamentoFromString(message.requestMessage)
-        if (medicineMessage != null) {
-            message.response = calculateService.execute(medicineMessage)
+        val medicationMessage = parseStringToMedication(message.requestMessage)
+        if (medicationMessage != null) {
+            message.response = calculateService.execute(medicationMessage)
         }
 
         return message
     }
 
-    fun calculateChatMessage(message: CalcMessage): CalcMessage {
+    fun calculateChatMessage(message: CalculationMessage): CalculationMessage {
         if (message.response?.finalResult == true) {
             return message
         }
 
         val jsonChat = this.chat.callChat(message.requestMessage) ?: ""
-        val medicineChat = parseMedicamentoFromJson(jsonChat)
-        if (medicineChat != null) {
-            message.response = calculateService.execute(medicineChat)
+        val medicationChat = parseJsonToMedication(jsonChat)
+        if (medicationChat != null) {
+            message.response = calculateService.execute(medicationChat)
         }
 
         return message
     }
 
-    fun generateErrorMessage(message: CalcMessage): CalcMessage {
+    fun generateErrorMessage(message: CalculationMessage): CalculationMessage {
         if (message.response != null) {
             return message
         }
@@ -77,10 +77,10 @@ class OrquestradorMedicamentoService(
         return message
     }
 
-    private fun buscaListaMedicamentos(): String {
-        val classesMedicamento = buscaTodasClassesMedicamento()
-        val nomesClasses = classesMedicamento.map { it.simpleName }
+    private fun buildResponseAllMedications(): String {
+        val medicationClasses = findAllMedications()
+        val classesNames = medicationClasses.map { it.simpleName }
 
-        return nomesClasses.joinToString("\n")
+        return classesNames.joinToString("\n")
     }
 }
